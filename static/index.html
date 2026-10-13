@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CloudOps AI Bookstore</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header><strong>CloudOps Books</strong><span>AI-assisted technical learning</span></header>
+  <main>
+    <section class="hero">
+      <p class="eyebrow">AWS · DEVOPS · GENERATIVE AI</p>
+      <h1>Learn technology with an AI book assistant.</h1>
+      <p>Explore cloud and engineering books, then ask grounded questions using Amazon Bedrock.</p>
+    </section>
+    <section><h2>Featured library</h2><div id="books" class="grid"></div></section>
+    <section class="assistant">
+      <div><p class="eyebrow">AI ASSISTANT</p><h2>Ask about a selected book</h2></div>
+      <select id="book"><option value="">Entire library</option></select>
+      <textarea id="question" placeholder="For example: Explain how Kubernetes readiness probes work."></textarea>
+      <button id="ask">Ask assistant</button>
+      <pre id="answer">AI_PROVIDER=mock is enabled for safe local testing.</pre>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>
+
