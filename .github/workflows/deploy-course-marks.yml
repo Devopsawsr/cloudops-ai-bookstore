@@ -1,0 +1,59 @@
+name: Deploy course marks
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - course-marks/**
+      - .github/workflows/deploy-course-marks.yml
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: course-marks-practice
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Update the two Lambda functions
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: us-east-1
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Assume the AWS deploy role
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Publish the validate function code
+        run: |
+          set -euo pipefail
+          cp course-marks/validate.py lambda_function.py
+          zip -q -j validate.zip lambda_function.py
+          aws lambda update-function-code \
+            --function-name course-marks-validate-practice \
+            --zip-file fileb://validate.zip \
+            --region "$AWS_REGION"
+          aws lambda wait function-updated \
+            --function-name course-marks-validate-practice \
+            --region "$AWS_REGION"
+
+      - name: Publish the process function code
+        run: |
+          set -euo pipefail
+          cp course-marks/process.py lambda_function.py
+          zip -q -j process.zip lambda_function.py
+          aws lambda update-function-code \
+            --function-name course-marks-process-practice \
+            --zip-file fileb://process.zip \
+            --region "$AWS_REGION"
+          aws lambda wait function-updated \
+            --function-name course-marks-process-practice \
+            --region "$AWS_REGION"

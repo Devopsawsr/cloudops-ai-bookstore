@@ -6,3 +6,4 @@ __pycache__/
 *.db
 postgres-data/
 
+course-marks/*.env
