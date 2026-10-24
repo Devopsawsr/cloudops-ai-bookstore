@@ -194,6 +194,32 @@ def post_thread(payload):
     return 201, thread
 
 
+
+def forward_course_marks(payload):
+    import urllib.error
+    import urllib.request
+    env = {}
+    config = Path("/var/www/cloudops-monolithic-bookstore/course-marks/course-marks.env")
+    if not config.exists():
+        return 503, {"ok": False, "message": "Course marks API is not configured."}
+    for line in config.read_text().splitlines():
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        env[key] = value
+    req = urllib.request.Request(
+        env["API_URL"],
+        data=json.dumps(payload).encode(),
+        method="POST",
+        headers={"content-type": "application/json", "x-course-marks-token": env["COURSE_MARKS_TOKEN"]},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=10) as res:
+            return res.status, json.loads(res.read().decode() or "{}")
+    except urllib.error.HTTPError as exc:
+        return exc.code, json.loads(exc.read().decode() or "{}")
+
+
 GETS = {
     "/api/books": lambda _query: (200, BOOKS),
     "/api/cart": get_cart,
@@ -212,6 +238,7 @@ POSTS = {
     "/api/exam": sit_exam,
     "/api/certificates": lambda payload: (201, issue_certificate(payload)),
     "/api/community": post_thread,
+    "/api/course-marks": forward_course_marks,
 }
 
 

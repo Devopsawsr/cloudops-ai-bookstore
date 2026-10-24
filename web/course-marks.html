@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Ebook result — Monolith</title>
+  <link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+  <header class="nav"><div class="wrap nav-in">
+    <a class="logo" href="index.html">Cloud and DevOps <span class="run-as">Monolith</span></a>
+    <a href="index.html">Home</a>
+  </div></header>
+  <main class="wrap" style="padding:32px 0">
+    <p class="kicker">ebook result</p>
+    <h1>Course marks</h1>
+    <p>Pass percentage is the marks. 70 or more is a pass. Attempt is which sitting this is. A change of 5 marks or more sends the alert. The time is set when you send the result.</p>
+    <form id="fix">
+      <p><label>Learner <input name="learner" value="Demo Learner" required></label></p>
+      <p><label>Course
+        <select name="course">
+          <option value="aws">AWS book</option>
+          <option value="terraform">Terraform book</option>
+          <option value="kubernetes">Kubernetes book</option>
+          <option value="docker">Docker book</option>
+          <option value="python">Python book</option>
+        </select>
+      </label></p>
+      <p><label>Marks <input name="marks" type="number" min="0" max="100" value="82" required></label></p>
+      <p><label>Previous marks <input name="previous_marks" type="number" min="0" max="100" value="74"></label></p>
+      <p><label>Attempt
+        <select name="attempt">
+          <option value="1">1 First sitting</option>
+          <option value="2" selected>2 Retake</option>
+          <option value="3">3 Final sitting</option>
+        </select>
+      </label></p>
+      <p><button type="submit">Send result</button></p>
+    </form>
+    <pre id="out"></pre>
+  </main>
+  <script>
+    document.getElementById("fix").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const form = event.target;
+      const body = {
+        learner: form.learner.value,
+        course: form.course.value,
+        marks: Number(form.marks.value),
+        previous_marks: form.previous_marks.value === "" ? null : Number(form.previous_marks.value),
+        attempt: Number(form.attempt.value)
+      };
+      const res = await fetch("/api/course-marks", {method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify(body)});
+      const payload = await res.json();
+      document.getElementById("out").textContent = res.status + " " + JSON.stringify(payload, null, 2);
+    });
+  </script>
+</body>
+</html>
